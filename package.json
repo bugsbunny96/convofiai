@@ -14,7 +14,6 @@
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.0.1",
     "@reduxjs/toolkit": "^2.7.0",
-    "@tailwindcss/forms": "^0.5.10",
     "axios": "^1.9.0",
     "framer-motion": "^12.9.2",
     "next": "15.3.1",
@@ -30,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
