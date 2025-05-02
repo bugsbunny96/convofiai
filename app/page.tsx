@@ -1,103 +1,131 @@
-import Image from "next/image";
+'use client';
+
+import MainLayout from './components/layout/MainLayout';
+import StatCard from './components/dashboard/StatCard';
+import LineChart from './components/dashboard/LineChart';
+import StatusList from './components/dashboard/StatusList';
+import {
+  ChatBubbleLeftRightIcon,
+  UserIcon,
+  ChartBarIcon,
+  UserGroupIcon,
+  ChatBubbleOvalLeftIcon,
+  PhoneIcon,
+  ChatBubbleLeftIcon,
+  PhotoIcon
+} from '@heroicons/react/24/outline';
+
+// Sample data - replace with real data
+const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const conversationData = [4, 10, 8, 15, 20, 12, 5];
+const leadsData = [3, 8, 6, 12, 15, 8, 3];
+
+const agentStatus = [
+  {
+    icon: <UserGroupIcon className="w-6 h-6" />,
+    name: 'Sales Agent',
+    status: 'AI',
+    conversations: 24,
+    responseRate: 98,
+    isActive: true
+  },
+  {
+    icon: <UserGroupIcon className="w-6 h-6" />,
+    name: 'Support Bot',
+    status: 'AI',
+    conversations: 18,
+    responseRate: 96,
+    isActive: true
+  },
+  {
+    icon: <UserIcon className="w-6 h-6" />,
+    name: 'John Doe',
+    status: 'Human',
+    conversations: 0,
+    responseRate: 92,
+    isActive: false
+  }
+];
+
+const channelStatus = [
+  {
+    icon: <ChatBubbleLeftIcon className="w-6 h-6" />,
+    name: 'Website Chat',
+    conversations: 32,
+    isActive: true
+  },
+  {
+    icon: <PhoneIcon className="w-6 h-6" />,
+    name: 'WhatsApp',
+    conversations: 18,
+    isActive: true
+  },
+  {
+    icon: <ChatBubbleOvalLeftIcon className="w-6 h-6" />,
+    name: 'Messenger',
+    conversations: 0,
+    isActive: false
+  },
+  {
+    icon: <PhotoIcon className="w-6 h-6" />,
+    name: 'Instagram',
+    conversations: 0,
+    isActive: false
+  }
+];
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <MainLayout>
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatCard
+            title="Total Conversations"
+            value="248"
+            change={{ value: 12, trend: 'up' }}
+            icon={<ChatBubbleLeftRightIcon className="w-6 h-6" />}
+          />
+          <StatCard
+            title="Leads Captured"
+            value="73"
+            change={{ value: 8, trend: 'up' }}
+            icon={<UserIcon className="w-6 h-6" />}
+          />
+          <StatCard
+            title="Conversion Rate"
+            value="18.2%"
+            change={{ value: 2, trend: 'down' }}
+            icon={<ChartBarIcon className="w-6 h-6" />}
+          />
+          <StatCard
+            title="Active Agents"
+            value="2/3"
+            change={{ value: 0, trend: 'up' }}
+            icon={<UserGroupIcon className="w-6 h-6" />}
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        {/* Charts and Status Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <LineChart
+              title="Conversations Overview"
+              data={conversationData}
+              labels={weekDays}
+            />
+            <LineChart
+              title="Leads Captured"
+              data={leadsData}
+              labels={weekDays}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          </div>
+          <div className="space-y-6">
+            <StatusList title="Agent Status" items={agentStatus} />
+            <StatusList title="Channel Status" items={channelStatus} />
+          </div>
+        </div>
     </div>
+    </MainLayout>
   );
 }

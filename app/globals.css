@@ -1,26 +1,44 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* 🎨 Custom Project Color Palette + Primary Color (#1A73E8) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --color-primary: #1A73E8;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Blue Scale Palette (0 - 10) */
+  --blue-0: #FFFFFF;
+  --blue-0-5: #E6F1FE;
+  --blue-1: #CCE2FC;
+  --blue-1-5: #B3D4FB;
+  --blue-2: #99C5FA;
+  --blue-3: #66A9F7;
+  --blue-4: #338CF5;
+  --blue-5: #006FF2;
+  --blue-6: #0059C2;
+  --blue-7: #004391;
+  --blue-8: #002C61;
+  --blue-8-5: #002149;
+  --blue-9: #001630;
+  --blue-9-5: #000B18;
+  --blue-10: #000000;
+
+  /* Default Theme Colors */
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(to bottom right, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
+  font-family: 'Inter', sans-serif;
 }
