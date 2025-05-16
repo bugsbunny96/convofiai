@@ -4,7 +4,7 @@ const app = new App({
     id: "convofi-users-zzqcxbo",
 });
 
-interface UserAccountData {
+export interface UserAccountData {
     body: {
         data: {
             name?: string;
