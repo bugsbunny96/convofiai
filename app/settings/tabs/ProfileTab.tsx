@@ -9,10 +9,10 @@ const ProfileTab: React.FC = () => {
       <section className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-lg font-semibold">Profile Information</h2>
+            <h2 className="text-lg text-gray-900 font-semibold">Profile Information</h2>
             <p className="text-gray-500 text-sm">Update your account details</p>
           </div>
-          <button className="px-4 py-2 border rounded text-sm font-medium bg-white hover:bg-gray-50">Edit Profile</button>
+          <button className="px-4 py-2 border rounded text-gray-900 text-sm font-medium bg-white hover:bg-gray-50">Edit Profile</button>
         </div>
         {/* <UserProfileCard ... /> */}
         <div className="flex items-center space-x-4">
