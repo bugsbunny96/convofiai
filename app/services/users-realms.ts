@@ -7,11 +7,13 @@ const app = new App({
 interface UserAccountData {
     body: {
         data: {
-            email?: string;
             name?: string;
-            password?: string;
-            [key: string]: unknown;
+            mail?: string;
+            mobile?: string;
+            user?: string;
+            srvc?: string;
         };
+        srvc?: string;
     };
 }
 
