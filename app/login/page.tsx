@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UserAccountCreate } from "../services/users-realms";
-import { UserAccountList } from "../services/users-realms";
+import { UserAccountCreate, UserAccountList } from "../services/users-realms";
 const LOGO_SRC = "/logo.svg"; // Replace with your actual logo path
 
 // Helper to store user data in localStorage
