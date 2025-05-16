@@ -1,4 +1,4 @@
-import { App } from "@realm/web";
+import { App } from "realm-web";
 
 const app = new App({
     id: "convofi-users-zzqcxbo",
@@ -6,7 +6,7 @@ const app = new App({
 
 interface UserAccountData {
     body: {
-        data: any;
+        data: Record<string, unknown>;
     };
 }
 
