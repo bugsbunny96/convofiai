@@ -1,26 +1,31 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { type Conversation } from '@/app/contexts/useChatStore';
+import { subscribeToConversation, unsubscribeFromConversation } from '@/lib/socket';
 import useChatStore from '@/app/contexts/useChatStore';
-import { sendMessage } from '@/lib/api';
-import { subscribeToConversation, unsubscribeFromConversation, sendSocketMessage } from '@/lib/socket';
-import ChatMessage from './ChatMessage';
+import { type Conversation } from '@/app/contexts/useChatStore';
+import ChatMessage from '@/app/components/conversations/ChatMessage';
 
 interface ChatWindowProps {
   conversation: Conversation;
 }
 
-interface MessageForm {
-  content: string;
-}
-
 export default function ChatWindow({ conversation }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { messages, addMessage, setMessages } = useChatStore();
-  const { register, handleSubmit, reset } = useForm<MessageForm>();
+  const {
+    drafts,
+    setDraft,
+    messagesByConversation,
+    addMessageForConversation,
+    updateConversationLastMessage,
+  } = useChatStore();
   const [isTyping, setIsTyping] = useState(false);
+  const [input, setInput] = useState('');
+  // For demo, assume always connected. Replace with real connection state if available.
+  const isConnected = true;
+
+  const messages = messagesByConversation[conversation.id] || [];
+  const draft = drafts[conversation.id] || '';
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -31,10 +36,15 @@ export default function ChatWindow({ conversation }: ChatWindowProps) {
   }, [messages]);
 
   useEffect(() => {
+    setInput(draft);
+  }, [draft, conversation.id]);
+
+  useEffect(() => {
     // Subscribe to conversation when component mounts
     subscribeToConversation(conversation.id, (socketMessage) => {
       if (socketMessage.type === 'message' && socketMessage.data.message) {
-        addMessage(socketMessage.data.message);
+        addMessageForConversation(conversation.id, socketMessage.data.message);
+        updateConversationLastMessage(conversation.id, socketMessage.data.message);
       } else if (socketMessage.type === 'typing') {
         setIsTyping(socketMessage.data.isTyping || false);
       }
@@ -44,39 +54,93 @@ export default function ChatWindow({ conversation }: ChatWindowProps) {
     return () => {
       unsubscribeFromConversation(conversation.id);
     };
-  }, [conversation.id, addMessage]);
+  }, [conversation.id]);
 
-  const onSubmit = async (data: MessageForm) => {
-    try {
-      // Send message through API
-      const message = await sendMessage(conversation.id, data.content);
-      
-      // Add message to local state
-      addMessage(message);
-      
-      // Send message through socket
-      sendSocketMessage({
-        type: 'message',
-        conversationId: conversation.id,
-        data: { message }
-      });
-      
-      reset();
-    } catch (error) {
-      console.error('Failed to send message:', error);
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+    setDraft(conversation.id, e.target.value);
   };
+
+  const handleSend = async () => {
+    if (!input.trim()) return;
+    // Send message through API (replace with real API call)
+    const message = {
+      id: Date.now().toString(),
+      content: input,
+      sender: 'me',
+      timestamp: new Date().toISOString(),
+      isRead: true,
+    };
+    addMessageForConversation(conversation.id, message);
+    updateConversationLastMessage(conversation.id, message);
+    setDraft(conversation.id, '');
+    setInput('');
+    // Send through socket if needed
+  };
+
+  // Dummy chat messages for demo if no messages exist
+  const dummyMessages = [
+    {
+      id: '1',
+      sender: 'customer',
+      content: 'Hello! I have a question about your product.',
+      timestamp: new Date().toISOString(),
+      isRead: true,
+    },
+    {
+      id: '2',
+      sender: 'agent',
+      content: "Hi! I'd be happy to help you with any questions you have about our products. What would you like to know?",
+      timestamp: new Date().toISOString(),
+      isRead: true,
+    },
+    {
+      id: '3',
+      sender: 'customer',
+      content: 'I\'m looking for a product that can help me with time management. Do you have anything like that?',
+      timestamp: new Date().toISOString(),
+      isRead: true,
+    },
+    {
+      id: '4',
+      sender: 'agent',
+      content: 'Absolutely! We have several tools that can help with time management. Our most popular one is the ConvofyAI Scheduler which allows you to automate your booking process and save time on calendar management. Would you like more information about it?',
+      timestamp: new Date().toISOString(),
+      isRead: true,
+    },
+    {
+      id: '5',
+      sender: 'customer',
+      content: 'That sounds perfect. Thank you for your help!',
+      timestamp: new Date().toISOString(),
+      isRead: true,
+    },
+  ];
 
   return (
     <div className="h-full flex flex-col">
+      {/* Connection Status Banner */}
+      {!isConnected && (
+        <div className="bg-yellow-100 text-yellow-800 p-2 text-center text-sm">
+          Reconnecting to chat...
+        </div>
+      )}
       {/* Chat Header */}
-      <div className="p-4 border-b border-gray-200 bg-white">
+      <div className="px-4 py-3 border-b border-gray-200 bg-white">
         <div className="flex items-center space-x-4">
           <div className="flex-1">
             <h2 className="text-lg font-semibold text-gray-900">
               {conversation.participants[0].name}
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 flex items-center gap-2">
+              <span 
+                className={`inline-block w-2 h-2 rounded-full ${
+                  conversation.participants[0].isOnline 
+                    ? 'bg-green-500 animate-pulse' 
+                    : 'bg-gray-400'
+                }`}
+                aria-hidden="true"
+              />
               {conversation.participants[0].isOnline ? 'Online' : 'Offline'}
               {isTyping && ' • Typing...'}
             </p>
@@ -86,7 +150,7 @@ export default function ChatWindow({ conversation }: ChatWindowProps) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
+        {(messages.length > 0 ? messages : dummyMessages).map((message) => (
           <ChatMessage key={message.id} message={message} />
         ))}
         <div ref={messagesEndRef} />
@@ -94,25 +158,25 @@ export default function ChatWindow({ conversation }: ChatWindowProps) {
 
       {/* Message Input */}
       <div className="p-4 border-t border-gray-200 bg-white">
-        <form onSubmit={handleSubmit(onSubmit)} className="flex space-x-4">
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            handleSend();
+          }}
+          className="flex space-x-4"
+        >
           <input
-            {...register('content', { required: true })}
             type="text"
+            value={input}
+            onChange={handleInputChange}
             placeholder="Type a message..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 border border-gray-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Type a message"
             onFocus={() => {
-              sendSocketMessage({
-                type: 'typing',
-                conversationId: conversation.id,
-                data: { isTyping: true }
-              });
+              // Optionally send typing event
             }}
             onBlur={() => {
-              sendSocketMessage({
-                type: 'typing',
-                conversationId: conversation.id,
-                data: { isTyping: false }
-              });
+              // Optionally send typing event
             }}
           />
           <button

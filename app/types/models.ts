@@ -31,18 +31,15 @@ export interface Organization {
   updatedAt: string;
 }
 
-// Agent Model
+// Agent Model (Frontend)
 export interface Agent {
   id: string;
   name: string;
   description: string;
-  avatar?: string;
-  type: 'chat' | 'voice' | 'email';
-  status: 'active' | 'inactive' | 'maintenance';
-  capabilities: string[];
-  organizationId: string;
+  skills: string[]; // e.g. ["Browse Web", "API Access"]
+  avatarUrl: string;
+  status: "active" | "inactive";
   createdAt: string;
-  updatedAt: string;
 }
 
 // Wallet Model
@@ -91,4 +88,26 @@ export interface Conversation {
   organizationId: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export enum LeadStatus {
+  New = 'New',
+  Contacted = 'Contacted',
+  Converted = 'Converted',
+}
+
+export enum LeadSource {
+  WebsiteChat = 'Website Chat',
+  WhatsApp = 'WhatsApp',
+  Messenger = 'Messenger',
+}
+
+export interface Lead {
+  name: string;
+  email: string;
+  phone: string;
+  source: LeadSource;
+  agent: string;
+  date: string; // ISO date string
+  status: LeadStatus;
 }

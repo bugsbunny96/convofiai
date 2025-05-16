@@ -1,50 +1,90 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { fetchConversations } from '@/lib/api';
 import { mockConversations } from '@/lib/mockData';
 import useChatStore from '@/app/contexts/useChatStore';
 import ConversationItem from './ConversationItem';
+import Spinner from '@/app/components/ui/Spinner';
+import ErrorState from '@/app/components/ui/ErrorState';
+import EmptyState from '@/app/components/ui/EmptyState';
 
 export default function ConversationList() {
   const { conversations, setConversations, selectedConversation } = useChatStore();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  const loadConversations = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      if (process.env.NODE_ENV === 'development') {
+        setConversations(mockConversations);
+      } else {
+        const data = await fetchConversations();
+        setConversations(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch conversations:', error);
+      setError('Failed to load conversations');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadConversations = async () => {
-      try {
-        setIsLoading(true);
-        // In development, use mock data
-        if (process.env.NODE_ENV === 'development') {
-          setConversations(mockConversations);
-        } else {
-          const data = await fetchConversations();
-          setConversations(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch conversations:', error);
-        setError('Failed to load conversations');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadConversations();
   }, [setConversations]);
 
-  if (isLoading) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  // Auto-select the first conversation if none is selected and conversations exist
+  useEffect(() => {
+    if (!selectedConversation && conversations && conversations.length > 0) {
+      setConversations(conversations); // ensure state is up to date
+      useChatStore.getState().setSelectedConversation(conversations[0]);
+    }
+  }, [conversations, selectedConversation]);
 
-  if (error) {
+  // Filter conversations by participant name or email
+  const filteredConversations = useMemo(() => {
+    if (!debouncedSearch) return conversations;
+    const lower = debouncedSearch.toLowerCase();
+    return conversations.filter((conv) =>
+      conv.participants.some(
+        (p) =>
+          p.name.toLowerCase().includes(lower) ||
+          p.email.toLowerCase().includes(lower)
+      )
+    );
+  }, [conversations, debouncedSearch]);
+
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorState message={error} onRetry={loadConversations} retryLabel="Retry loading conversations" />;
+
+  // If no conversations, show dummy data loader
+  if (!conversations || conversations.length === 0) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <p className="text-red-500">{error}</p>
+      <div className="h-full flex flex-col items-center justify-center gap-4">
+        <EmptyState
+          message="No conversations found."
+          action={
+            <button
+              className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 transition"
+              onClick={() => setConversations(mockConversations)}
+            >
+              Load Demo Conversations
+            </button>
+          }
+        />
       </div>
     );
   }
@@ -56,8 +96,11 @@ export default function ConversationList() {
         <div className="relative">
           <input
             type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search conversations..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Search conversations"
           />
           <svg
             className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
@@ -77,13 +120,17 @@ export default function ConversationList() {
 
       {/* Conversations List */}
       <div className="flex-1 overflow-y-auto">
-        {conversations.map((conversation) => (
+        {filteredConversations.map((conversation) => (
           <ConversationItem
             key={conversation.id}
             conversation={conversation}
             isActive={selectedConversation?.id === conversation.id}
+            onClick={() => useChatStore.getState().setSelectedConversation(conversation)}
           />
         ))}
+        {filteredConversations.length === 0 && (
+          <EmptyState message="No conversations found." />
+        )}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { type Conversation } from '@/app/contexts/useChatStore';
-import TabSwitcher from './TabSwitcher';
+import Tabs from '@/app/components/ui/Tabs';
 import InfoTab from './InfoTab';
 import HistoryTab from './HistoryTab';
 import NotesTab from './NotesTab';
@@ -31,7 +31,7 @@ export default function ConversationDetails({ conversation }: ConversationDetail
 
   return (
     <div className="h-full flex flex-col">
-      <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+      <Tabs tabs={['Info', 'History', 'Notes']} activeTab={activeTab} onTabChange={tab => setActiveTab(tab as Tab)} />
       <div className="flex-1 overflow-y-auto">
         {renderTabContent()}
       </div>

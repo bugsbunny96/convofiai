@@ -9,7 +9,7 @@ const tabs = ['Info', 'History', 'Notes'] as const;
 
 export default function TabSwitcher({ activeTab, onTabChange }: TabSwitcherProps) {
   return (
-    <div className="border-b border-gray-200">
+    <div className="border-b border-gray-200 pt-4">
       <nav className="flex -mb-px" aria-label="Tabs">
         {tabs.map((tab) => (
           <button

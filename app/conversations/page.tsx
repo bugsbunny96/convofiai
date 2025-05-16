@@ -21,14 +21,18 @@ export default function ConversationsPage() {
 
   return (
     <MainLayout>
-      <div className="h-[calc(100vh-4rem)] flex">
+      <div className="h-[calc(100vh-4rem)] flex flex-col md:flex-row">
         {/* Left Sidebar - Conversation List */}
-        <div className="w-80 border-r border-gray-200 bg-white">
+        <div className="hidden md:block md:w-80 border-r border-gray-200 bg-white">
           <ConversationList />
         </div>
 
         {/* Main Chat Window */}
-        <div className="flex-1 bg-gray-50">
+        <div className="flex-1 bg-gray-50 w-full">
+          {/* Mobile header for context */}
+          <div className="md:hidden p-4 border-b border-gray-200 bg-white font-semibold text-lg">
+            Conversations
+          </div>
           {selectedConversation ? (
             <ChatWindow conversation={selectedConversation} />
           ) : (
@@ -38,7 +42,7 @@ export default function ConversationsPage() {
 
         {/* Right Sidebar - Conversation Details */}
         {selectedConversation && (
-          <div className="w-80 border-l border-gray-200 bg-white">
+          <div className="hidden md:block md:w-80 border-l border-gray-200 bg-white">
             <ConversationDetails conversation={selectedConversation} />
           </div>
         )}

@@ -43,6 +43,16 @@ export const sendMessage = async (conversationId: string, content: string) => {
   return response.data.data;
 };
 
+// Notes endpoints
+export const fetchNotes = async (conversationId: string): Promise<{ notes: string }> => {
+  const response = await api.get<ApiResponse<{ notes: string }>>(`/conversations/${conversationId}/notes`);
+  return response.data.data;
+};
+
+export const saveNotes = async (conversationId: string, notes: string): Promise<void> => {
+  await api.post<ApiResponse<null>>(`/conversations/${conversationId}/notes`, { notes });
+};
+
 // Socket event types
 export interface SocketMessage {
   type: 'message' | 'typing' | 'read';

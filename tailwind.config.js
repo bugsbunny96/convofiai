@@ -28,6 +28,16 @@ module.exports = {
           '9.5': '#000B18',
         }
       },
+      keyframes: {
+        wave: {
+          '0%': { transform: 'scale(1)', opacity: '0.7', backgroundColor: '#1A73E8' },
+          '70%': { transform: 'scale(2.2)', opacity: '0', backgroundColor: '#1A73E8' },
+          '100%': { transform: 'scale(2.2)', opacity: '0', backgroundColor: '#1A73E8' },
+        },
+      },
+      animation: {
+        wave: 'wave 1.6s cubic-bezier(0.4,0,0.2,1) infinite',
+      },
     },
   },
   plugins: [],

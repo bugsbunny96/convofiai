@@ -1,4 +1,4 @@
-import { User, Conversation, Message } from '@/app/types/models';
+import { User, Conversation, Message, Agent } from '@/app/types/models';
 
 export const mockUsers: User[] = [
   {
@@ -55,33 +55,166 @@ export const mockMessages: Message[] = [
 export const mockConversations: Conversation[] = [
   {
     id: '1',
-    participants: [mockUsers[0], mockUsers[1]],
-    lastMessage: mockMessages[2],
+    participants: [
+      {
+        id: 'u1',
+        name: 'Sarah Johnson',
+        avatar: 'https://i.pravatar.cc/150?img=1',
+        isOnline: true,
+        email: 'sarah.johnson@example.com',
+        role: 'user',
+        organizationId: 'org1',
+        createdAt: '2023-01-01T00:00:00Z',
+        updatedAt: '2023-01-01T00:00:00Z',
+      },
+    ],
+    lastMessage: {
+      id: '5',
+      sender: 'customer',
+      content: 'That sounds perfect. Thank you for your help!',
+      timestamp: '2023-03-12T10:22:00Z',
+      isRead: true,
+      type: 'text',
+    },
     unreadCount: 0,
     status: 'active',
     tags: ['product-inquiry', 'new-customer'],
-    assignedAgent: '2',
     organizationId: 'org1',
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T10:02:00Z',
+    createdAt: '2023-01-01T00:00:00Z',
+    updatedAt: '2023-01-01T00:00:00Z',
   },
   {
     id: '2',
-    participants: [mockUsers[0], mockUsers[1]],
+    participants: [
+      {
+        id: 'u2',
+        name: 'Mark Williams',
+        avatar: 'https://i.pravatar.cc/150?img=2',
+        isOnline: false,
+        email: 'mark.williams@example.com',
+        role: 'user',
+        organizationId: 'org1',
+        createdAt: '2023-01-01T00:00:00Z',
+        updatedAt: '2023-01-01T00:00:00Z',
+      },
+    ],
     lastMessage: {
-      id: '4',
-      content: 'Thanks for your help!',
-      sender: '1',
-      timestamp: '2024-01-01T11:00:00Z',
+      id: '3',
+      sender: 'customer',
+      content: 'Thank you for the update!',
+      timestamp: '2023-03-11T16:45:00Z',
       isRead: false,
       type: 'text',
     },
     unreadCount: 1,
     status: 'active',
-    tags: ['follow-up', 'satisfied'],
-    assignedAgent: '2',
+    tags: ['order', 'support'],
     organizationId: 'org1',
+    createdAt: '2023-01-01T00:00:00Z',
+    updatedAt: '2023-01-01T00:00:00Z',
+  },
+  {
+    id: '3',
+    participants: [
+      {
+        id: 'u3',
+        name: 'Emily Davis',
+        avatar: 'https://i.pravatar.cc/150?img=3',
+        isOnline: true,
+        email: 'emily.davis@example.com',
+        role: 'user',
+        organizationId: 'org1',
+        createdAt: '2023-01-01T00:00:00Z',
+        updatedAt: '2023-01-01T00:00:00Z',
+      },
+    ],
+    lastMessage: {
+      id: '2',
+      sender: 'customer',
+      content: 'When will the new product be available?',
+      timestamp: '2023-03-10T09:00:00Z',
+      isRead: false,
+      type: 'text',
+    },
+    unreadCount: 2,
+    status: 'active',
+    tags: ['product', 'availability'],
+    organizationId: 'org1',
+    createdAt: '2023-01-01T00:00:00Z',
+    updatedAt: '2023-01-01T00:00:00Z',
+  },
+  {
+    id: '4',
+    participants: [
+      {
+        id: 'u4',
+        name: 'Michael Brown',
+        avatar: 'https://i.pravatar.cc/150?img=4',
+        isOnline: false,
+        email: 'michael.brown@example.com',
+        role: 'user',
+        organizationId: 'org1',
+        createdAt: '2023-01-01T00:00:00Z',
+        updatedAt: '2023-01-01T00:00:00Z',
+      },
+    ],
+    lastMessage: {
+      id: '2',
+      sender: 'customer',
+      content: 'Can you recommend a product for me?',
+      timestamp: '2023-03-09T14:20:00Z',
+      isRead: false,
+      type: 'text',
+    },
+    unreadCount: 1,
+    status: 'active',
+    tags: ['recommendation'],
+    organizationId: 'org1',
+    createdAt: '2023-01-01T00:00:00Z',
+    updatedAt: '2023-01-01T00:00:00Z',
+  },
+];
+
+export const mockMessagesByConversationId: Record<string, Message[]> = {
+  '1': [
+    { id: '1', sender: 'customer', content: 'Hello! I have a question about your product.', timestamp: '2023-03-12T10:15:00Z', isRead: true, type: 'text' },
+    { id: '2', sender: 'agent', content: 'Hi Sarah! I\'d be happy to help you with any questions you have about our products. What would you like to know?', timestamp: '2023-03-12T10:15:00Z', isRead: true, type: 'text' },
+    { id: '3', sender: 'customer', content: 'I\'m looking for a product that can help me with time management. Do you have anything like that?', timestamp: '2023-03-12T10:15:00Z', isRead: true, type: 'text' },
+    { id: '4', sender: 'agent', content: 'Absolutely! We have several tools that can help with time management. Our most popular one is the ConvofyAI Scheduler which allows you to automate your booking process and save time on calendar management. Would you like more information about it?', timestamp: '2023-03-12T10:15:00Z', isRead: true, type: 'text' },
+    { id: '5', sender: 'customer', content: 'That sounds perfect. Thank you for your help!', timestamp: '2023-03-12T10:22:00Z', isRead: true, type: 'text' },
+  ],
+  '2': [
+    { id: '1', sender: 'customer', content: 'I need help with my order #12345', timestamp: '2023-03-11T16:30:00Z', isRead: true, type: 'text' },
+    { id: '2', sender: 'agent', content: 'Hi Mark, I\'m checking your order status now.', timestamp: '2023-03-11T16:32:00Z', isRead: true, type: 'text' },
+    { id: '3', sender: 'customer', content: 'Thank you for the update!', timestamp: '2023-03-11T16:45:00Z', isRead: false, type: 'text' },
+  ],
+  '3': [
+    { id: '1', sender: 'customer', content: 'When will the new product be available?', timestamp: '2023-03-10T09:00:00Z', isRead: false, type: 'text' },
+    { id: '2', sender: 'agent', content: 'Hi Emily, the new product will be available next month. We\'ll notify you as soon as it\'s ready!', timestamp: '2023-03-10T09:05:00Z', isRead: false, type: 'text' },
+  ],
+  '4': [
+    { id: '1', sender: 'customer', content: 'Can you recommend a product for me?', timestamp: '2023-03-09T14:20:00Z', isRead: false, type: 'text' },
+    { id: '2', sender: 'agent', content: 'Hi Michael, can you tell me more about your needs so I can recommend the best product?', timestamp: '2023-03-09T14:22:00Z', isRead: false, type: 'text' },
+  ],
+};
+
+export const mockAgents: Agent[] = [
+  {
+    id: '1',
+    name: 'Sales Assistant',
+    description: 'Helps potential customers find the right products and answers pricing questions.',
+    skills: ['Browse Web', 'API Access'],
+    avatarUrl: 'https://i.pravatar.cc/150?img=11',
+    status: 'active',
     createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T11:00:00Z',
+  },
+  {
+    id: '2',
+    name: 'Customer Support',
+    description: 'Handles customer inquiries, troubleshooting, and support tickets.',
+    skills: ['Knowledge Base', 'Ticketing'],
+    avatarUrl: 'https://i.pravatar.cc/150?img=12',
+    status: 'active',
+    createdAt: '2024-01-02T00:00:00Z',
   },
 ]; 
