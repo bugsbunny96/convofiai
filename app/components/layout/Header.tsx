@@ -42,14 +42,14 @@ export default function Header() {
           </button>
 
           {/* User menu */}
-          <div className="flex items-center">
+          {/* <div className="flex items-center">
             <button className="flex items-center max-w-xs rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
               <span className="sr-only">Open user menu</span>
               <div className="h-8 w-8 rounded-full bg-primaryLight flex items-center justify-center">
                 <span className="text-primary font-medium">U</span>
               </div>
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </header>

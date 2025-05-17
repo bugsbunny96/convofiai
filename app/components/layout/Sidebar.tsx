@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useNavigation } from '@/app/context/NavigationContext';
 import { usePathname } from 'next/navigation';
+import { Popover } from '@headlessui/react';
 import {
   ChartBarIcon,
   ChatBubbleLeftRightIcon,
@@ -14,7 +15,8 @@ import {
   ChartPieIcon,
   Bars3Icon,
   XMarkIcon,
-  PhoneIcon
+  PhoneIcon,
+  ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -33,6 +35,18 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const { setSelectedTab, isReady } = useNavigation();
   const pathname = usePathname();
+  // const router = useRouter();
+
+  const handleLogout = () => {
+    // Clear any local storage or state
+    localStorage.clear();
+    sessionStorage.clear();
+    // Remove cookies by setting them to expire in the past
+    document.cookie = "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = "user_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    // Redirect to login page
+    window.location.href = "/login";
+  };
 
   useEffect(() => {
     setIsMounted(true);
@@ -106,15 +120,35 @@ export default function Sidebar() {
 
           {/* User profile */}
           <div className="p-4 border-t">
-            <div className="flex items-center">
-              <div className="w-8 h-8 rounded-full bg-primaryLight flex items-center justify-center">
-                <span className="text-primary font-medium">U</span>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-700">User Name</p>
-                <p className="text-xs text-gray-500">user@example.com</p>
-              </div>
-            </div>
+            <Popover className="relative">
+              {() => (
+                <>
+                  <Popover.Button className="w-full">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-primaryLight flex items-center justify-center">
+                          <span className="text-primary font-medium">U</span>
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-sm font-medium text-gray-700">User Name</p>
+                          <p className="text-xs text-gray-500">user@example.com</p>
+                        </div>
+                      </div>
+                    </div>
+                  </Popover.Button>
+
+                  <Popover.Panel className="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <ArrowRightOnRectangleIcon className="w-5 h-5 mr-2" />
+                      Logout
+                    </button>
+                  </Popover.Panel>
+                </>
+              )}
+            </Popover>
           </div>
         </div>
       </div>
