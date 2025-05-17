@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import MainLayout from '../../components/layout/MainLayout';
 import CreateAgentFormTabs from '@/app/components/ai-agents/CreateAgentFormTabs';
 import BasicInfoStep from '@/app/components/ai-agents/CreateAgentForm/BasicInfoStep';
@@ -29,7 +30,7 @@ const tabOrder = [
   'channels-integrations',
 ];
 
-export default function CreateAgentPage() {
+function CreateAgentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { agents, updateAgent } = useAgents();
@@ -151,5 +152,13 @@ export default function CreateAgentPage() {
         </div>
       </div>
     </MainLayout>
+  );
+}
+
+export default function CreateAgentPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CreateAgentContent />
+    </Suspense>
   );
 } 

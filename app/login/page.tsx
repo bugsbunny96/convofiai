@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { UserAccountCreate, UserAccountList } from "../services/users-realms";
-const LOGO_SRC = "/logo.svg"; // Replace with your actual logo path
 
 // Helper to store user data in localStorage
 function storeUserToLocal(user: { name: string; mail: string; mobile: string }) {
@@ -43,7 +42,9 @@ export default function LoginPage() {
         ) {
           setSuccess("Login successful!");
           storeUserToLocal({ name: "ConvofiAI", mail: email, mobile });
+          // Set both user_session and auth-token cookies for compatibility with middleware
           document.cookie = "user_session=dummy; path=/; max-age=86400; SameSite=Lax";
+          document.cookie = "auth-token=dummy; path=/; max-age=86400; SameSite=Lax";
           setTimeout(() => {
             window.location.href = "/";
           }, 1200);
@@ -133,28 +134,28 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-2 relative overflow-hidden">
-      {/* Graphics (pointer-events-none, aria-hidden) */}
+      {/* Background Graphics */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none" aria-hidden="true">
-        {/* Example: Add your SVGs or images here */}
-        <img src="/graphics/agent-status.png" alt="" className="absolute top-8 right-8 w-64 opacity-30" />
-        <img src="/graphics/ai-upload.png" alt="" className="absolute bottom-8 left-8 w-40 opacity-20" />
-        {/* Add more as needed */}
+        <div className="absolute top-8 right-8 w-64 h-64 opacity-30">
+          {/* <Image src="/graphics/agent-status.png" alt="" fill style={{objectFit:'contain'}} sizes="256px" priority /> */}
+        </div>
+        <div className="absolute bottom-8 left-8 w-40 h-40 opacity-20">
+          {/* <Image src="/graphics/ai-upload.png" alt="" fill style={{objectFit:'contain'}} sizes="160px" priority /> */}
+        </div>
       </div>
       <div className="w-full max-w-md z-10">
-        <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-10 relative">
+        <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-10 relative flex flex-col items-center">
           {/* Logo */}
-          <div className="flex justify-center mb-6">
-            <img src={LOGO_SRC} alt="ConvofyAI Logo" className="h-12 w-auto" draggable={false} />
+          <div className="flex justify-center mb-6 w-full">
+            <div className="h-12 w-12 relative">
+              {/* <Image src={LOGO_SRC} alt="ConvofyAI Logo" fill style={{objectFit:'contain'}} priority /> */}
+            </div>
           </div>
           {/* Tab Switcher */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-6 w-full">
             <button
               type="button"
-              className={`px-6 py-2 rounded-l-lg font-semibold text-base transition ${
-                tab === "login"
-                  ? "bg-primary text-white shadow"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
+              className={`px-6 py-2 rounded-l-lg font-semibold text-base transition ${tab === "login" ? "bg-primary text-white shadow" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
               onClick={() => handleTabSwitch("login")}
               disabled={tab === "login"}
             >
@@ -162,26 +163,22 @@ export default function LoginPage() {
             </button>
             <button
               type="button"
-              className={`px-6 py-2 rounded-r-lg font-semibold text-base transition ${
-                tab === "signup"
-                  ? "bg-primary text-white shadow"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
+              className={`px-6 py-2 rounded-r-lg font-semibold text-base transition ${tab === "signup" ? "bg-primary text-white shadow" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
               onClick={() => handleTabSwitch("signup")}
               disabled={tab === "signup"}
             >
               Signup
             </button>
           </div>
-          <h1 className="text-2xl font-bold text-center mb-2 text-gray-900">
+          <h1 className="text-2xl font-bold text-center mb-2 text-gray-900 w-full">
             {tab === "login" ? "Welcome Back" : "Create Account"}
           </h1>
-          <p className="text-center text-gray-500 mb-6 text-base">
+          <p className="text-center text-gray-500 mb-6 text-base w-full">
             {tab === "login"
               ? "Login to your ConvofyAI account"
               : "Sign up to get started with ConvofyAI"}
           </p>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5 w-full">
             {tab === "signup" && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="name">Name</label>

@@ -1,57 +1,85 @@
 'use client';
 
-import { type Conversation } from '@/app/contexts/useChatStore';
+import { type Conversation, type Message } from '@/app/contexts/useChatStore';
+import useChatStore from '@/app/contexts/useChatStore';
+import { useMemo } from 'react';
 
 interface HistoryTabProps {
   conversation: Conversation;
 }
 
+interface HistoryEvent {
+  id: string;
+  time: string;
+  type: 'message' | 'status';
+  description: string;
+}
+
+interface HistoryDay {
+  id: string;
+  date: string;
+  events: HistoryEvent[];
+}
+
 export default function HistoryTab({ conversation }: HistoryTabProps) {
-  // This would typically fetch conversation history from an API
-  const history = [
-    {
-      id: '1',
-      date: 'Mar 12, 2023',
-      events: [
-        {
-          id: '1',
-          time: '10:15 AM',
+  const {
+    messagesByConversation,
+  } = useChatStore();
+  const messages = useMemo(() => messagesByConversation[conversation.id] || [], [messagesByConversation, conversation.id]);
+
+
+  console.log()
+
+  // Group messages by date
+  const history = messages.reduce((acc: HistoryDay[], message: Message) => {
+    const date = new Date(message.timestamp).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    
+    const existingDay = acc.find(day => day.date === date);
+    if (existingDay) {
+      existingDay.events.push({
+        id: message.id,
+        time: new Date(message.timestamp).toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit'
+        }),
+        type: 'message',
+        description: message.content
+      });
+    } else {
+      acc.push({
+        id: date,
+        date,
+        events: [{
+          id: message.id,
+          time: new Date(message.timestamp).toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit'
+          }),
           type: 'message',
-          description: 'First contact established',
-        },
-        {
-          id: '2',
-          time: '10:20 AM',
-          type: 'status',
-          description: 'Inquiry about product features',
-        },
-      ],
-    },
-    {
-      id: '2',
-      date: 'Today',
-      events: [
-        {
-          id: '3',
-          time: '10:15 AM',
-          type: 'message',
-          description: 'Follow-up conversation',
-        },
-        {
-          id: '4',
-          time: '10:22 AM',
-          type: 'status',
-          description: 'Demo scheduled',
-        },
-      ],
-    },
-  ];
+          description: message.content
+        }]
+      });
+    }
+    return acc;
+  }, []);
+
+  if (history.length === 0) {
+    return (
+      <div className="p-4 text-center text-gray-500">
+        No conversation history available
+      </div>
+    );
+  }
 
   return (
     <div className="p-4">
       <div className="flow-root">
         <ul role="list" className="-mb-8">
-          {history.map((day, dayIdx) => (
+          {history.map((day: HistoryDay, dayIdx: number) => (
             <li key={day.id}>
               <div className="relative pb-8">
                 {dayIdx !== history.length - 1 ? (
@@ -70,7 +98,7 @@ export default function HistoryTab({ conversation }: HistoryTabProps) {
                     <div>
                       <p className="text-sm text-gray-500">{day.date}</p>
                       <div className="mt-2 space-y-4">
-                        {day.events.map((event) => (
+                        {day.events.map((event: HistoryEvent) => (
                           <div key={event.id} className="flex items-start space-x-2">
                             <span className="text-xs text-gray-500">{event.time}</span>
                             <p className="text-sm text-gray-700">{event.description}</p>

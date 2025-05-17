@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { fetchConversations } from '@/lib/api';
 import { mockConversations } from '@/lib/mockData';
 import useChatStore from '@/app/contexts/useChatStore';
@@ -15,6 +15,7 @@ export default function ConversationList() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const didAutoSelect = useRef(false);
 
   // Debounce search input
   useEffect(() => {
@@ -24,7 +25,7 @@ export default function ConversationList() {
     return () => clearTimeout(handler);
   }, [search]);
 
-  const loadConversations = async () => {
+  const loadConversations = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -40,17 +41,22 @@ export default function ConversationList() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [setConversations]);
 
   useEffect(() => {
     loadConversations();
-  }, [setConversations]);
+  }, [loadConversations]);
 
   // Auto-select the first conversation if none is selected and conversations exist
   useEffect(() => {
-    if (!selectedConversation && conversations && conversations.length > 0) {
-      setConversations(conversations); // ensure state is up to date
+    if (
+      !didAutoSelect.current &&
+      !selectedConversation &&
+      conversations &&
+      conversations.length > 0
+    ) {
       useChatStore.getState().setSelectedConversation(conversations[0]);
+      didAutoSelect.current = true;
     }
   }, [conversations, selectedConversation]);
 

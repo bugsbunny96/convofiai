@@ -6,6 +6,7 @@ import { useAgents } from "@/app/hooks/useAgents";
 import { Agent } from "@/app/types/models";
 import { KnowledgeBaseData } from "./KnowledgeBaseStep";
 import { BasicInfoData } from "./BasicInfoStep";
+import Image from "next/image";
 
 interface PromptBehaviorData {
   systemPrompt: string;
@@ -105,15 +106,29 @@ const ChannelsIntegrationsStep: FC<ChannelsIntegrationsStepProps> = ({ onCancel,
   const status: Agent["status"] = basicInfo?.active ? "active" : "inactive";
   const createdAt = new Date().toISOString();
 
-  // Create agent object
-  const newAgent: Agent = {
-    id: Date.now().toString(),
+  // Create agent object for creation (no id)
+  const newAgentForCreate = {
     name,
     description,
     skills,
     avatarUrl,
     status,
     createdAt,
+    model: 'gpt-4',
+    temperature: promptBehavior?.temperature ?? 0.7,
+    maxTokens: promptBehavior?.maxTokens ?? 2000,
+    channels: Object.entries(enabledIntegrations)
+      .filter((entry) => entry[1])
+      .map(([key]) => {
+        const integration = INTEGRATIONS.find(i => i.key === key);
+        return integration ? integration.name : key;
+      }),
+  };
+
+  // Create agent object for edit (with id)
+  const newAgent: Agent = {
+    id: Date.now().toString(),
+    ...newAgentForCreate,
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -121,7 +136,7 @@ const ChannelsIntegrationsStep: FC<ChannelsIntegrationsStepProps> = ({ onCancel,
     if (mode === 'edit' && onSave) {
       onSave(newAgent);
     } else {
-      addAgent(newAgent);
+      addAgent(newAgentForCreate);
       router.push("/ai-agents");
     }
   };
@@ -129,14 +144,6 @@ const ChannelsIntegrationsStep: FC<ChannelsIntegrationsStepProps> = ({ onCancel,
   const handleCancel = () => {
     if (onCancel) onCancel();
     else router.push("/ai-agents");
-  };
-
-  // Helper for avatar initials
-  const getInitials = (name: string) => {
-    if (!name) return "AI";
-    const parts = name.split(" ");
-    if (parts.length === 1) return parts[0][0]?.toUpperCase() || "A";
-    return (parts[0][0] + parts[1][0]).toUpperCase();
   };
 
   return (
@@ -184,10 +191,10 @@ const ChannelsIntegrationsStep: FC<ChannelsIntegrationsStepProps> = ({ onCancel,
           {/* Agent Avatar */}
           <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 flex flex-col items-center bg-white">
             <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-white text-3xl font-bold mb-4 overflow-hidden">
-              {avatar ? (
-                <img src={avatar} alt="Agent Avatar" className="w-full h-full object-cover rounded-full" />
-              ) : (
-                getInitials(name)
+              {avatar && (
+                <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4">
+                  <Image src={avatar} alt="Agent Avatar" width={96} height={96} className="w-full h-full object-cover rounded-full" />
+                </div>
               )}
             </div>
             <input

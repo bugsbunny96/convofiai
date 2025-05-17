@@ -110,22 +110,23 @@ export function DropdownMenu<T extends string>({ options, value, onChange, label
             onKeyDown={handleKeyDown}
           >
             <div className="p-2 space-y-1">
-              {options.map((opt, idx) => (
+              {options.map((option, i) => (
                 <button
-                  key={opt}
-                  role="menuitem"
-                  aria-selected={value === opt}
-                  aria-current={focusedIdx === idx}
-                  className={`rounded-md w-full text-left px-4 py-2 text-sm ${value === opt ? 'bg-primary/10 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-100'} ${focusedIdx === idx ? 'ring-2 ring-primary' : ''}`}
+                  key={option}
+                  type="button"
+                  role="option"
+                  aria-selected={focusedIdx === i}
+                  className={`w-full text-left px-4 py-2 text-sm ${
+                    focusedIdx === i ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
+                  } hover:bg-gray-50 focus:outline-none focus:bg-gray-50`}
                   onClick={() => {
-                    onChange(opt);
+                    onChange(option);
                     setOpen(false);
-                    btnRef.current?.focus();
                   }}
+                  onKeyDown={handleKeyDown}
                   tabIndex={-1}
-                  onMouseEnter={() => setFocusedIdx(idx)}
                 >
-                  {opt}
+                  {option}
                 </button>
               ))}
             </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useRef, useState, useEffect } from "react";
+import { FC, useRef, useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { CloudArrowUpIcon, TrashIcon } from "@heroicons/react/24/outline";
 
@@ -38,19 +38,18 @@ const KnowledgeBaseStep: FC<KnowledgeBaseStepProps> = ({ onNext, onCancel, value
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Compose all fields for validation and parent sync
-  const allFields: KnowledgeBaseData = {
+  const allFields = useMemo(() => ({
     files,
     urls,
     faqs,
     agentName,
-  };
+  }), [files, urls, faqs, agentName]);
 
   useEffect(() => {
     if (onChange) {
       onChange(allFields, isStepValid());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [files, urls, faqs, agentName]);
+  }, [allFields, onChange]);
 
   // File upload logic
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

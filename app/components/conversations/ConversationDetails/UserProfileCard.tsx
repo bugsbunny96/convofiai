@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 
 interface UserProfileCardProps {
   name: string;
@@ -35,7 +36,7 @@ export default function UserProfileCard({ name, email, location, avatar }: UserP
       <div className="flex items-center space-x-4">
         {/* Avatar */}
         {avatar ? (
-          <img src={avatar} alt={name} className="w-16 h-16 rounded-full" />
+          <Image src={avatar} alt={name} width={64} height={64} className="w-16 h-16 rounded-full" />
         ) : (
           <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
             <span className="text-2xl font-medium text-blue-600">
@@ -98,7 +99,7 @@ export default function UserProfileCard({ name, email, location, avatar }: UserP
             </button>
             <div className="flex flex-col items-center space-y-4">
               {avatar ? (
-                <img src={avatar} alt={name} className="w-20 h-20 rounded-full" />
+                <Image src={avatar} alt={name} width={80} height={80} className="w-20 h-20 rounded-full" />
               ) : (
                 <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
                   <span className="text-3xl font-medium text-blue-600">{name.charAt(0).toUpperCase()}</span>

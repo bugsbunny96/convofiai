@@ -3,6 +3,7 @@
 import { type Conversation } from '@/app/contexts/useChatStore';
 import useChatStore from '@/app/contexts/useChatStore';
 import { formatDistanceToNow } from 'date-fns';
+import Image from 'next/image';
 
 interface ConversationItemProps {
   conversation: Conversation;
@@ -55,15 +56,11 @@ export default function ConversationItem({
         <div className="flex-shrink-0 relative">
           <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
             {participant.avatar ? (
-              <img
-                src={participant.avatar}
-                alt={participant.name}
-                className="w-full h-full rounded-full object-cover"
-              />
+              <Image src={participant.avatar} alt={participant.name} width={40} height={40} className="w-10 h-10 rounded-full object-cover" />
             ) : (
-              <span className="text-lg font-medium text-gray-600">
-                {participant.name.charAt(0).toUpperCase()}
-              </span>
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                <span className="text-blue-700 font-bold">{participant.name.charAt(0).toUpperCase()}</span>
+              </div>
             )}
           </div>
           {/* Online/Offline Status */}

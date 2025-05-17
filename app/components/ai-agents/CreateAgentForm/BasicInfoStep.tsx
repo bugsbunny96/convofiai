@@ -2,6 +2,7 @@
 
 import { FC, useRef, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export interface BasicInfoData {
   name: string;
@@ -119,13 +120,11 @@ const BasicInfoStep: FC<BasicInfoStepProps> = ({ onNext, value, onChange }) => {
       {/* Right: Avatar Upload & Pro Tips */}
       <div className="w-full md:w-80 flex flex-col items-center gap-6">
         <div className="w-full flex flex-col items-center border-2 border-dashed border-gray-200 rounded-xl p-6">
-          <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-white text-3xl font-bold mb-4 overflow-hidden">
-            {avatar ? (
-              <img src={avatar} alt="Agent Avatar" className="w-full h-full object-cover rounded-full" />
-            ) : (
-              'AI'
-            )}
-          </div>
+          {avatar && (
+            <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4">
+              <Image src={avatar} alt="Agent Avatar" width={96} height={96} className="w-full h-full object-cover rounded-full" />
+            </div>
+          )}
           <input
             type="file"
             accept="image/*"

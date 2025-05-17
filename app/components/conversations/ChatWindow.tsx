@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { subscribeToConversation, unsubscribeFromConversation } from '@/lib/socket';
 import useChatStore from '@/app/contexts/useChatStore';
-import { type Conversation } from '@/app/contexts/useChatStore';
+import { type Conversation, Message } from '@/app/contexts/useChatStore';
 import ChatMessage from '@/app/components/conversations/ChatMessage';
 
 interface ChatWindowProps {
@@ -24,7 +24,7 @@ export default function ChatWindow({ conversation }: ChatWindowProps) {
   // For demo, assume always connected. Replace with real connection state if available.
   const isConnected = true;
 
-  const messages = messagesByConversation[conversation.id] || [];
+  const messages = useMemo(() => messagesByConversation[conversation.id] || [], [messagesByConversation, conversation.id]);
   const draft = drafts[conversation.id] || '';
 
   const scrollToBottom = () => {
@@ -41,20 +41,29 @@ export default function ChatWindow({ conversation }: ChatWindowProps) {
 
   useEffect(() => {
     // Subscribe to conversation when component mounts
-    subscribeToConversation(conversation.id, (socketMessage) => {
-      if (socketMessage.type === 'message' && socketMessage.data.message) {
-        addMessageForConversation(conversation.id, socketMessage.data.message);
-        updateConversationLastMessage(conversation.id, socketMessage.data.message);
-      } else if (socketMessage.type === 'typing') {
-        setIsTyping(socketMessage.data.isTyping || false);
+    const handler = (socketMessage: unknown) => {
+      if (
+        typeof socketMessage === 'object' &&
+        socketMessage !== null &&
+        'type' in socketMessage &&
+        'data' in socketMessage
+      ) {
+        const msg = socketMessage as { type: string; data: { message?: Message; isTyping?: boolean } };
+        if (msg.type === 'message' && msg.data.message) {
+          addMessageForConversation(conversation.id, msg.data.message);
+          updateConversationLastMessage(conversation.id, msg.data.message);
+        } else if (msg.type === 'typing' && typeof msg.data.isTyping === 'boolean') {
+          setIsTyping(msg.data.isTyping);
+        }
       }
-    });
+    };
+    subscribeToConversation(conversation.id, handler);
 
     // Cleanup subscription when component unmounts
     return () => {
       unsubscribeFromConversation(conversation.id);
     };
-  }, [conversation.id]);
+  }, [conversation.id, addMessageForConversation, updateConversationLastMessage]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);

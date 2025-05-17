@@ -11,6 +11,8 @@ export interface Agent {
   lastActive?: string;
   conversationsCount?: number;
   channels: string[];
+  avatarUrl?: string;
+  skills?: string[];
 }
 
 interface UseAgentsState {
