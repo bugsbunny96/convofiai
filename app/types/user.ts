@@ -29,6 +29,7 @@ export interface UserAccount {
   item: string;
   meta: UserMetadata;
   avtr?: string;
+  name: string
   coms: UserCommunication[];
   user: UserCommunication[];
   feat: UserFeatures;

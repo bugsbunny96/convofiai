@@ -66,6 +66,7 @@ export default function Sidebar() {
       }
     }
   }, []);
+  
 
   if (!isMounted) {
     return null;

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { UserAccountList } from "../services/users-realms";
 import { UserAccount } from "../types/user";
 import Image from "next/image";
-import ConvofiAI from "@/public/ConvofiAI.svg";
+import ConvofiAI from "/public/ConvofiAI.svg";
 import { normalizeUserAccount } from "@/app/lib/normalizeUser";
 
 const ACCOUNT_TYPES = {
@@ -61,29 +61,7 @@ export default function SelectAccountPage() {
             console.error("Error parsing cached accounts:", error);
           }
         }
-
-        // Fetch fresh accounts from API route
-        const response = await fetch('/api/accounts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            body: {
-              data: { user: "convo@ai.com" },
-              srvc: "988b9aee-f02a-411c-957d-02ef420586a2"
-            }
-          }),
-        });
-        const result = await response.json();
-
-        if (result?.stat && Array.isArray(result.data?.list)) {
-          const normalizedAccounts = result.data.list.map(normalizeUserAccount);
-          setAccounts(normalizedAccounts);
-          // Cache the accounts for future use
-          localStorage.setItem("convofyai_accounts", JSON.stringify(normalizedAccounts));
-        } else {
-          setAccounts([]);
-          setError("No accounts found");
-        }
+   
       } catch (error) {
         console.error("Error fetching accounts:", error);
         setError("Failed to fetch accounts. Please try again later.");
@@ -95,6 +73,8 @@ export default function SelectAccountPage() {
 
     fetchAccounts();
   }, []);
+
+  console.log(accounts)
 
   const handleAccountSelect = (account: UserAccount) => {
     setSelectedAccount(account);
