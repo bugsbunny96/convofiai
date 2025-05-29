@@ -30,7 +30,7 @@ const ProfileTab: React.FC = () => {
       <section className="bg-white rounded-lg shadow p-6">
         <h2 className="text-lg font-semibold mb-2">Security</h2>
         <p className="text-gray-500 text-sm mb-4">Update your password and security settings</p>
-        <form className="space-y-4 max-w-md">
+        <form className="space-y-4">
           <input type="password" placeholder="Current Password" className="w-full border rounded px-3 py-2" />
           <input type="password" placeholder="New Password" className="w-full border rounded px-3 py-2" />
           <input type="password" placeholder="Confirm New Password" className="w-full border rounded px-3 py-2" />

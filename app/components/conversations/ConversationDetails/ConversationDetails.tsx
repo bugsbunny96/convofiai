@@ -31,8 +31,13 @@ export default function ConversationDetails({ conversation }: ConversationDetail
 
   return (
     <div className="h-full flex flex-col">
-      <Tabs tabs={['Info', 'History', 'Notes']} activeTab={activeTab} onTabChange={tab => setActiveTab(tab as Tab)} />
-      <div className="flex-1 overflow-y-auto">
+      <Tabs 
+        tabs={['Info', 'History', 'Notes']} 
+        activeTab={activeTab} 
+        onTabChange={tab => setActiveTab(tab as Tab)} 
+        className="text-sm sm:text-base"
+      />
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4">
         {renderTabContent()}
       </div>
     </div>

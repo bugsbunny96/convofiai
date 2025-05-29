@@ -98,18 +98,18 @@ export default function ConversationList() {
   return (
     <div className="h-full flex flex-col">
       {/* Search Header */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-3 sm:p-4 border-b border-gray-200">
         <div className="relative">
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search conversations..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             aria-label="Search conversations"
           />
           <svg
-            className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+            className="absolute left-2.5 sm:left-3 top-2.5 h-4 w-4 sm:h-5 sm:w-5 text-gray-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -135,7 +135,9 @@ export default function ConversationList() {
           />
         ))}
         {filteredConversations.length === 0 && (
-          <EmptyState message="No conversations found." />
+          <div className="h-full flex items-center justify-center p-4">
+            <EmptyState message="No conversations found." />
+          </div>
         )}
       </div>
     </div>

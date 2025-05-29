@@ -95,30 +95,30 @@ export function Toast({
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
     >
-      <div className="fixed top-0 right-0 z-50 p-4 w-full max-w-xs sm:max-w-sm md:max-w-md">
+      <div className="fixed top-0 right-0 z-50 p-2 sm:p-4 w-full max-w-xs sm:max-w-sm md:max-w-md">
         <div
-          className={`rounded-lg p-4 shadow-lg ${colors[type]} flex items-start gap-3 relative`}
-          style={{ minWidth: 280 }}
+          className={`rounded-lg p-3 sm:p-4 shadow-lg ${colors[type]} flex items-start gap-2 sm:gap-3 relative`}
+          style={{ minWidth: 220 }}
         >
-          <div className="flex-shrink-0 pt-1">
-            <Icon className="h-6 w-6" aria-hidden="true" />
+          <div className="flex-shrink-0 pt-0.5 sm:pt-1">
+            <Icon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
           </div>
-          <div className="flex-1 min-w-0 pr-8">
-            {title && <p className="text-sm font-semibold leading-tight mb-0.5">{title}</p>}
+          <div className="flex-1 min-w-0 pr-6 sm:pr-8">
+            {title && <p className="text-xs sm:text-sm font-semibold leading-tight mb-0.5">{title}</p>}
             {(description || children) && (
-              <p className="text-sm mt-0.5 break-words leading-snug">{description || children}</p>
+              <p className="text-xs sm:text-sm mt-0.5 break-words leading-snug">{description || children}</p>
             )}
           </div>
           <button
             type="button"
-            className="absolute top-2 right-2 inline-flex rounded-md text-gray-400 hover:text-gray-500 focus:outline-none"
+            className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 inline-flex rounded-md text-gray-400 hover:text-gray-500 focus:outline-none"
             onClick={() => {
               setShow(false);
               onClose?.();
             }}
             aria-label="Close"
           >
-            <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+            <XMarkIcon className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
           </button>
         </div>
       </div>

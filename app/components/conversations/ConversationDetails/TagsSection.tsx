@@ -23,13 +23,13 @@ export default function TagsSection({ tags }: TagsSectionProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg p-4">
-      <h3 className="text-sm font-medium text-gray-900 mb-4">Tags</h3>
-      <div className="flex flex-wrap gap-2">
+    <div className="bg-white rounded-lg p-3 sm:p-4">
+      <h3 className="text-xs sm:text-sm font-medium text-gray-900 mb-3 sm:mb-4">Tags</h3>
+      <div className="flex flex-wrap gap-1.5 sm:gap-2">
         {tags.map((tag) => (
           <span
             key={tag.id}
-            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTagColor(
+            className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-medium ${getTagColor(
               tag.color
             )}`}
           >

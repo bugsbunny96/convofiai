@@ -2,9 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { UserAccountCreate, UserAccountList } from "../services/users-realms";
+import { UserAccount } from "../types/user";
+import SideImg from "../../public/sidegraphics.svg";
+import Image from "next/image";
+import ConvofiAI from "@/public/ConvofiAI.svg";
+import { normalizeUserAccount } from "@/app/lib/normalizeUser";
 
 // Helper to store user data in localStorage
-function storeUserToLocal(user: { name: string; mail: string; mobile: string }) {
+function storeUserToLocal(user: UserAccount) {
   localStorage.setItem("convofyai_user", JSON.stringify(user));
 }
 
@@ -40,17 +45,33 @@ export default function LoginPage() {
           email === "convofi@ai.com" &&
           mobile === "+919876543210"
         ) {
+          const dummyUser: UserAccount = {
+            item: "dummy-user",
+            meta: { name: "ConvofiAI" },
+            coms: [
+              { nmbr: email, type: "email" },
+              { nmbr: mobile, type: "mobile" }
+            ],
+            user: [
+              { nmbr: email, type: "email" },
+              { nmbr: mobile, type: "mobile" }
+            ],
+            feat: { self: true, hold: false },
+            onbd: { obnm: true, obcr: true, oblc: true, obcm: true, obtr: true },
+            actv: true,
+            role: "user"
+          };
+          
           setSuccess("Login successful!");
-          storeUserToLocal({ name: "ConvofiAI", mail: email, mobile });
-          // Set both user_session and auth-token cookies for compatibility with middleware
-          document.cookie = "user_session=dummy; path=/; max-age=86400; SameSite=Lax";
+          storeUserToLocal(dummyUser);
           document.cookie = "auth-token=dummy; path=/; max-age=86400; SameSite=Lax";
           setTimeout(() => {
-            window.location.href = "/";
+            window.location.href = "/select-account";
           }, 1200);
           setLoading(false);
           return;
         }
+
         // Real login
         const res = await UserAccountList({
           body: {
@@ -58,17 +79,16 @@ export default function LoginPage() {
             srvc: "988b9aee-f02a-411c-957d-02ef420586a2"
           }
         });
+
         if (res?.stat && res.data?.list?.length > 0) {
-          const user = res.data.list[0];
           setSuccess("Login successful!");
-          storeUserToLocal({
-            name: user.name,
-            mail: user.mail,
-            mobile: user.mobile
-          });
-          document.cookie = "user_session=dummy; path=/; max-age=86400; SameSite=Lax";
+          // Normalize all accounts before storing
+          const normalizedAccounts = res.data.list.map(normalizeUserAccount);
+          localStorage.setItem("convofyai_accounts", JSON.stringify(normalizedAccounts));
+          storeUserToLocal(normalizedAccounts[0]);
+          document.cookie = "auth-token=dummy; path=/; max-age=86400; SameSite=Lax";
           setTimeout(() => {
-            window.location.href = "/";
+            window.location.href = "/select-account";
           }, 1200);
         } else {
           setError("User not found. Redirecting to Signup...");
@@ -86,16 +106,29 @@ export default function LoginPage() {
             srvc: "988b9aee-f02a-411c-957d-02ef420586a2",
           },
         });
+
         if (res?.stat) {
-          setSuccess("Account created successfully! Redirecting to Dashboard...");
-          storeUserToLocal({
-            name,
-            mail: email,
-            mobile,
+          // Fetch full user object after signup
+          const listRes = await UserAccountList({
+            body: {
+              data: { user: email },
+              srvc: "988b9aee-f02a-411c-957d-02ef420586a2",
+            },
           });
-          document.cookie = "user_session=dummy; path=/; max-age=86400; SameSite=Lax";
+          if (listRes?.stat && listRes.data?.list?.length > 0) {
+            const normalizedAccounts = listRes.data.list.map(normalizeUserAccount);
+            localStorage.setItem("convofyai_accounts", JSON.stringify(normalizedAccounts));
+            storeUserToLocal(normalizedAccounts[0]);
+          } else {
+            // fallback: store what we have, normalized
+            const normalized = normalizeUserAccount(res.data);
+            localStorage.setItem("convofyai_accounts", JSON.stringify([normalized]));
+            storeUserToLocal(normalized);
+          }
+          setSuccess("Account created successfully! Redirecting to Account Selection...");
+          document.cookie = "auth-token=dummy; path=/; max-age=86400; SameSite=Lax";
           setTimeout(() => {
-            window.location.href = "/";
+            window.location.href = "/select-account";
           }, 1200);
         } else if (res?.memo === "user account exist") {
           setError("User already exists. Redirecting to Login...");
@@ -126,29 +159,29 @@ export default function LoginPage() {
   useEffect(() => {
     if (success) {
       const timeout = setTimeout(() => {
-        window.location.href = "/";
+        window.location.href = "/select-account";
       }, 1200);
       return () => clearTimeout(timeout);
     }
   }, [success]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-2 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-2 relative overflow-hidden w-full">
       {/* Background Graphics */}
       <div className="absolute inset-0 z-0 pointer-events-none select-none" aria-hidden="true">
         <div className="absolute top-8 right-8 w-64 h-64 opacity-30">
-          {/* <Image src="/graphics/agent-status.png" alt="" fill style={{objectFit:'contain'}} sizes="256px" priority /> */}
+          <Image src={SideImg} alt="" fill style={{objectFit:'contain'}} sizes="256px" priority />
         </div>
         <div className="absolute bottom-8 left-8 w-40 h-40 opacity-20">
-          {/* <Image src="/graphics/ai-upload.png" alt="" fill style={{objectFit:'contain'}} sizes="160px" priority /> */}
+          <Image src={SideImg} alt="" fill style={{objectFit:'contain'}} sizes="256px" priority />
         </div>
       </div>
       <div className="w-full max-w-md z-10">
         <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-10 relative flex flex-col items-center">
           {/* Logo */}
           <div className="flex justify-center mb-6 w-full">
-            <div className="h-12 w-12 relative">
-              {/* <Image src={LOGO_SRC} alt="ConvofyAI Logo" fill style={{objectFit:'contain'}} priority /> */}
+            <div className="h-12 w-36 relative">
+              <Image src={ConvofiAI} alt="ConvofyAI Logo" fill style={{objectFit:'contain'}} priority />
             </div>
           </div>
           {/* Tab Switcher */}

@@ -9,6 +9,18 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "ConvofyAI - Unified Communication Platform",
   description: "AI-Powered Unified Communication SaaS Platform",
+  icons: [
+    {
+      rel: 'icon',
+      url: '/logo.svg',
+      type: 'image/svg+xml',
+    },
+    {
+      rel: 'apple-touch-icon',
+      url: '/logo.svg',
+      type: 'image/svg+xml',
+    },
+  ],
 };
 
 export default function RootLayout({

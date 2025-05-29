@@ -36,7 +36,7 @@ const NotificationsTab: React.FC = () => {
   const toggle = (key: NotificationKey) => setPrefs(p => ({ ...p, [key]: !p[key] }));
 
   return (
-    <section className="bg-white rounded-lg shadow p-6 max-w-2xl">
+    <section className="bg-white rounded-lg shadow p-6">
       <h2 className="text-lg font-semibold mb-2">Notification Preferences</h2>
       <p className="text-gray-500 text-sm mb-4">Choose what updates you receive</p>
       <div className="space-y-6">

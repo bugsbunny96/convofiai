@@ -39,14 +39,14 @@ export default function NotesTab({ conversation }: NotesTabProps) {
   };
 
   if (loading) {
-    return <div className="p-4 text-gray-500">Loading notes...</div>;
+    return <div className="p-3 sm:p-4 text-sm sm:text-base text-gray-500">Loading notes...</div>;
   }
   if (error) {
-    return <div className="p-4 text-red-500">{error}</div>;
+    return <div className="p-3 sm:p-4 text-sm sm:text-base text-red-500">{error}</div>;
   }
 
   return (
-    <div className="p-4">
+    <div className="p-3 sm:p-4">
       <div className="bg-white rounded-lg">
         <label htmlFor="notes-textarea" className="sr-only">Notes</label>
         <textarea
@@ -54,11 +54,11 @@ export default function NotesTab({ conversation }: NotesTabProps) {
           value={notes}
           onChange={handleNotesChange}
           placeholder="Add notes about this conversation..."
-          className="w-full h-48 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          className="w-full h-40 sm:h-48 p-3 sm:p-4 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
           aria-label="Conversation notes"
         />
-        {saving && <div className="text-xs text-gray-400 mt-2">Saving...</div>}
-        {saveError && <div className="text-xs text-red-500 mt-2">{saveError}</div>}
+        {saving && <div className="text-xs sm:text-sm text-gray-400 mt-1.5 sm:mt-2">Saving...</div>}
+        {saveError && <div className="text-xs sm:text-sm text-red-500 mt-1.5 sm:mt-2">{saveError}</div>}
       </div>
     </div>
   );

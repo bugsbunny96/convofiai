@@ -28,11 +28,13 @@ function StatusItem({ icon, name, status, conversations, responseRate, isActive 
           {status && <p className="text-sm text-gray-500">{status}</p>}
         </div>
       </div>
-      <div className="text-right">
+      <div className="text-right flex flex-row gap-3 items-center">
+        <div className="flex flex-col">
         <p className="font-medium">{conversations} conv.</p>
         {responseRate && (
           <p className="text-sm text-gray-500">{responseRate}% response rate</p>
         )}
+        </div>
         {typeof isActive !== 'undefined' && (
           <div className={`w-2 h-2 rounded-full ml-auto mt-1 ${isActive ? 'bg-green-500' : 'bg-red-500'}`} />
         )}

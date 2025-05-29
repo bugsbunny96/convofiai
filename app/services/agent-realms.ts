@@ -4,7 +4,7 @@ const app = new App({
     id: "convofi-agents-zzqcxbo",
 });
 
-export const AgentCreate = async (item) => {
+export const AgentCreate = async (item: any) => {
     try {
       var apiKey ="i2bp5M72XwLWsE9v6vUccG9PnJBOZTk01ijJ1SduiGgmLNTKVEEgu6WjxQ7RcBxb";
       const credentials = App.Credentials.apiKey(apiKey);
