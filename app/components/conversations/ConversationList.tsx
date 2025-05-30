@@ -60,6 +60,7 @@ export default function ConversationList() {
     }
   }, [conversations, selectedConversation]);
 
+
   // Filter conversations by participant name or email
   const filteredConversations = useMemo(() => {
     if (!debouncedSearch) return conversations;
@@ -72,6 +73,8 @@ export default function ConversationList() {
       )
     );
   }, [conversations, debouncedSearch]);
+
+  console.log(conversations)
 
   if (isLoading) return <Spinner />;
   if (error) return <ErrorState message={error} onRetry={loadConversations} retryLabel="Retry loading conversations" />;

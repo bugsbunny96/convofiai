@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useNavigation } from '@/app/context/NavigationContext';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Popover } from '@headlessui/react';
 import {
   ChartBarIcon,
@@ -42,6 +42,8 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [user, setUser] = useState<UserAccount | null>(null);
 
+  const router = useRouter()
+
   const handleLogout = () => {
     // Clear any local storage or state
     localStorage.clear();
@@ -67,6 +69,11 @@ export default function Sidebar() {
     }
   }, []);
   
+ 
+  const handleSwitchAccount = ()=>{
+    router.push("/select-account")
+  }
+
 
   if (!isMounted) {
     return null;
@@ -134,11 +141,11 @@ export default function Sidebar() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="w-8 h-8 rounded-full bg-primaryLight flex items-center justify-center">
-                          <span className="text-primary font-medium text-sm sm:text-base">U</span>
+                          <span className="text-primary font-medium text-sm sm:text-base">{user.role== "team" ? 'B':'U'}</span>
                         </div>
                         <div className="ml-3">
                           <p className="text-sm font-medium text-gray-700 truncate max-w-[120px] sm:max-w-[160px]">
-                            {user?.meta?.name || "User"}
+                            {user?.meta?.name || user?.name || "User"}
                           </p>
                           {user?.meta?.name && (
                             <p className="text-xs text-gray-500 truncate max-w-[120px] sm:max-w-[160px]">
@@ -146,11 +153,12 @@ export default function Sidebar() {
                             </p>
                           )}
                           <p className="text-xs text-gray-500 truncate max-w-[120px] sm:max-w-[160px]">
-                            {
+                            {user.mail}
+                            {/* {
                               user?.coms?.find(c => c.type === "email")?.nmbr ||
                               user?.user?.find(c => c.type === "email")?.nmbr ||
                               ""
-                            }
+                            } */}
                           </p>
                         </div>
                       </div>
@@ -165,6 +173,13 @@ export default function Sidebar() {
                     >
                       <ArrowRightOnRectangleIcon className="w-5 h-5 mr-2" />
                       Logout
+                    </button>
+                    <button
+                      onClick={handleSwitchAccount}
+                      className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <ArrowRightOnRectangleIcon className="w-5 h-5 mr-2" />
+                      Switch Account
                     </button>
                   </Popover.Panel>
                 </>

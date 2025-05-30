@@ -2,7 +2,7 @@
 
 export default function EmptyChatState() {
   return (
-    <div className="h-full flex items-center justify-center">
+    <div className="flex items-center justify-center" style={{height:'83vh'}}>
       <div className="text-center">
         <div className="mx-auto h-12 w-12 text-gray-400">
           <svg

@@ -20,7 +20,7 @@ const ACCOUNT_TYPES = {
     id: "business",
     title: "Business",
     description: "Access to business features and team management",
-    icon: "💼",
+    icon: "👥",//"💼",
     roles: ["owner", "manager", "member"]
   },
   personal: {
@@ -31,6 +31,10 @@ const ACCOUNT_TYPES = {
     roles: ["user"]
   }
 };
+
+function storeUserToLocal(user: UserAccount) {
+  localStorage.setItem("convofyai_user", JSON.stringify(user));
+}
 
 export default function SelectAccountPage() {
   const [accounts, setAccounts] = useState<UserAccount[]>([]);
@@ -47,30 +51,56 @@ export default function SelectAccountPage() {
       try {
         setFetching(true);
         setError("");
-
+        
         // Try to load accounts from localStorage first
         const accountsStr = typeof window !== 'undefined' ? localStorage.getItem("convofyai_accounts") : null;
         if (accountsStr) {
           try {
-            const accounts = JSON.parse(accountsStr);
-            if (Array.isArray(accounts) && accounts.length > 0) {
-              setAccounts(accounts.map(normalizeUserAccount));
-              return;
+            // const accounts = JSON.parse(accountsStr);
+            // if (Array.isArray(accounts) && accounts.length > 0) {
+            //   setAccounts(accounts.map(normalizeUserAccount));
+            //   // return;
+            // }
+
+            var userStr =  localStorage.getItem("convofyai_user") 
+            userStr = JSON.parse(userStr)
+            
+            const res = await UserAccountList({
+              body: {
+                data: { user: userStr.mail },
+                srvc: "988b9aee-f02a-411c-957d-02ef420586a2"
+              }
+            });
+
+            // console.log(res)
+            if (res?.stat && res.data?.list?.length > 0) {
+
+              // Normalize all accounts before storing
+              const normalizedAccounts = res.data.list.map(normalizeUserAccount);
+              localStorage.setItem("convofyai_accounts", JSON.stringify(normalizedAccounts));
+              storeUserToLocal(normalizedAccounts[0]);
+              setAccounts(normalizedAccounts)
+              document.cookie = "auth-token=dummy; path=/; max-age=86400; SameSite=Lax";
+
             }
+
+
+
           } catch (error) {
-            console.error("Error parsing cached accounts:", error);
+            console.error("Error fetching accounts:", error);
+            setError("Failed to fetch accounts. Please try again later.");
+            setAccounts([]);
+          } finally {
+            setFetching(false);
           }
-        }
-   
-      } catch (error) {
+        };
+      }
+      catch (err) {
         console.error("Error fetching accounts:", error);
         setError("Failed to fetch accounts. Please try again later.");
         setAccounts([]);
-      } finally {
-        setFetching(false);
       }
-    };
-
+    }
     fetchAccounts();
   }, []);
 
@@ -82,10 +112,10 @@ export default function SelectAccountPage() {
 
     // Store the selected account
     localStorage.setItem("convofyai_selected_account", JSON.stringify(account));
-    
+
     // Set session cookie
     document.cookie = `user_session=${account.item}; path=/; max-age=86400; SameSite=Lax`;
-    
+
     // Redirect to dashboard
     setTimeout(() => {
       router.push("/");
@@ -108,13 +138,27 @@ export default function SelectAccountPage() {
     return ACCOUNT_TYPES.personal;
   };
 
+
+  const handleLogout = async () => {
+
+    localStorage.clear();
+    sessionStorage.clear();
+    // Remove cookies by setting them to expire in the past
+    document.cookie = "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = "user_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    // Redirect to login page
+    window.location.href = "/login";
+
+  }
+
+
   if (fetching) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4 py-4 overflow-y-scroll w-full">
         {/* Logo */}
         <div className="flex justify-center mb-6 w-full">
           <div className="h-12 w-36 relative">
-            <Image src={ConvofiAI} alt="ConvofyAI Logo" fill style={{objectFit:'contain'}} priority />
+            <Image src={ConvofiAI} alt="ConvofyAI Logo" fill style={{ objectFit: 'contain' }} priority />
           </div>
         </div>
         <div className="text-center text-primary">Loading accounts...</div>
@@ -128,7 +172,7 @@ export default function SelectAccountPage() {
         {/* Logo */}
         <div className="flex justify-center mb-6 w-full">
           <div className="h-12 w-36 relative">
-            <Image src={ConvofiAI} alt="ConvofyAI Logo" fill style={{objectFit:'contain'}} priority />
+            <Image src={ConvofiAI} alt="ConvofyAI Logo" fill style={{ objectFit: 'contain' }} priority />
           </div>
         </div>
         <div className="text-center text-red-500">{error}</div>
@@ -141,7 +185,7 @@ export default function SelectAccountPage() {
       {/* Logo */}
       <div className="flex justify-center mb-6 w-full">
         <div className="h-12 w-36 relative">
-          <Image src={ConvofiAI} alt="ConvofyAI Logo" fill style={{objectFit:'contain'}} priority />
+          <Image src={ConvofiAI} alt="ConvofyAI Logo" fill style={{ objectFit: 'contain' }} priority />
         </div>
       </div>
       <div className="w-full max-w-5xl">
@@ -155,24 +199,32 @@ export default function SelectAccountPage() {
           ) : (
             accounts.map((account) => {
               const accountType = getAccountType(account);
+              // {console.log(account)}
               return (
                 <button
                   key={account.item}
                   onClick={() => handleAccountSelect(account)}
                   disabled={loading}
-                  className={`p-6 rounded-xl border-2 transition-all shadow-md ${
-                    selectedAccount?.item === account.item
+                  className={`relative p-6 rounded-xl border-2 transition-all shadow-md ${selectedAccount?.item === account.item
                       ? "border-primary bg-primary/5"
                       : "border-gray-200 hover:border-primary/50 hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
+                  {/* Green Circle in top-right */}
+                  <div className="absolute top-2 right-2 w-3 h-3 bg-green-300 rounded-full"></div>
+
+                  {/* Icon and content */}
                   <div className="text-4xl mb-4">{accountType.icon}</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{account.meta.name}</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{account.name}</h3>
                   <p className="text-gray-600 text-sm">{accountType.description}</p>
-                  {/* {account.role === "team" && account.feat.role && (
-                    <p className="text-primary text-sm mt-2">Role: {account.feat.role}</p>
-                  )} */}
+                  {account.role === "user" && (
+                    <p className="text-gray-600 text-sm mt-2">Personal Account</p>
+                  )}
+                  {account.role === "team" && (
+                    <p className="text-gray-600 text-sm mt-2">Business Account</p>
+                  )}
                 </button>
+
               );
             })
           )}
@@ -182,13 +234,26 @@ export default function SelectAccountPage() {
             <p className="text-primary">Redirecting to dashboard...</p>
           </div>
         )}
-        <div className="text-center mt-8">
+
+        {(accounts.filter(x => x.role === "team")).length === 0 && (
+          <div className="text-center mt-4">
+            <button
+              onClick={handleCreateBusinessAccount}
+              disabled={loading || creatingAccount}
+              className="px-6 py-3 bg-black text-white rounded-lg hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {creatingAccount ? "Creating..." : "Create Business Account"}
+            </button>
+          </div>
+        )}
+
+
+        <div className="text-center mt-4">
           <button
-            onClick={handleCreateBusinessAccount}
+            onClick={handleLogout}
             disabled={loading || creatingAccount}
-            className="px-6 py-3 bg-black text-white rounded-lg hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {creatingAccount ? "Creating..." : "Create Business Account"}
+            className="px-6 py-3 border border-red-500 text-red-600 bg-transparent rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"          >
+            {creatingAccount ? "Creating..." : "Logout User"}
           </button>
         </div>
       </div>

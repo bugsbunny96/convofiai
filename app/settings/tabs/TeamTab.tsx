@@ -4,28 +4,34 @@ import { useParams } from 'next/navigation';
 
 const TeamTab: React.FC = () => {
   const params = useParams();
-  const teamId = params?.teamId as string | undefined;
+  // const teamId = params?.teamId as string | undefined;
 
   const [members, setMembers] = useState<any[]>([]);
   const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState('Admin');
+  const [inviteRole, setInviteRole] = useState('Viewer');
   const [inviteName, setInviteName] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState('');
   const [fetching, setFetching] = useState(true);
   const [fetchError, setFetchError] = useState('');
+  const [selectedAccount, setSelectedAccount] = useState()
+
+
 
   // Fetch team members from backend
-  const fetchMembers = async () => {
+  const fetchMembers = async (teamId) => {
+    // console.log(teamId)
     if (!teamId) {
       setFetchError('No team selected.');
       setFetching(false);
       return;
     }
+    setLoading(true)
     setFetching(true);
     setFetchError('');
     try {
       const res = await TeamMemberList(teamId);
+      // console.log(res)
       if (res?.stat && Array.isArray(res.data?.list)) {
         setMembers(res.data.list.map((m: any) => ({
           name: m.meta?.name || '',
@@ -36,30 +42,37 @@ const TeamTab: React.FC = () => {
       } else {
         setMembers([]);
         setFetchError(res?.memo || 'Failed to fetch team members');
+        
       }
     } catch (err) {
       setMembers([]);
       setFetchError('Server error. Please try again.');
     }
     setFetching(false);
+    setLoading(false)
+
   };
 
   useEffect(() => {
-    fetchMembers();
+    var selectedAccount = localStorage.getItem("convofyai_selected_account")
+    var user = (JSON.parse(selectedAccount))
+    setSelectedAccount(user)
+    // console.log(user)
+    fetchMembers(user.item);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teamId]);
+  }, []);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!teamId) {
-      setFeedback('No team selected.');
-      return;
-    }
+    // if (!teamId) {
+    //   setFeedback('No team selected.');
+    //   return;
+    // }
     setLoading(true);
     setFeedback('');
     try {
       const res = await TeamMemberCreate({
-        team: teamId,
+        team: selectedAccount.item,
         user: {
           name: inviteName,
           mail: inviteEmail,
@@ -69,7 +82,7 @@ const TeamTab: React.FC = () => {
       });
       if (res.stat) {
         setFeedback('Invitation sent!');
-        await fetchMembers(); // Refresh list
+        await fetchMembers(selectedAccount.item); // Refresh list
         setInviteEmail('');
         setInviteName('');
         setInviteRole('Admin');
@@ -81,6 +94,18 @@ const TeamTab: React.FC = () => {
     }
     setLoading(false);
   };
+
+  // console.log(loading)
+
+if (loading) return (
+  <div className='p-2 border rounded flex items-center gap-2'>
+    <p className='text-sm text-gray-600'>Please Wait...</p>
+    <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+  </div>
+);
+
+
+
 
   return (
     <div className="space-y-8">
@@ -161,8 +186,10 @@ const TeamTab: React.FC = () => {
               value={inviteRole}
               onChange={e => setInviteRole(e.target.value)}
             >
-              <option>Admin</option>
               <option>Viewer</option>
+              <option>Member</option>
+              <option>Admin</option>
+              
             </select>
           </div>
           <button
